@@ -27,6 +27,8 @@ getRmqPass() {
     fi
 }
 
+git_location="/home/hakan/parosReceiver"
+
 # install rabbitmq server
 echoGreen "Installing APT Prerequisites...\n"
 apt-get update && apt-get -y upgrade
@@ -49,3 +51,16 @@ getRmqPass
 rabbitmqctl add_user $rmq_user $rmq_pass
 rabbitmqctl set_user_tags $rmq_user administrator
 rabbitmqctl set_permissions -p / $rmq_user "." "." "."
+
+echoGreen "Creating system files...\n"
+
+cp $git_location/parosReceiver.service /etc/systemd/system/parosReceiver
+systemctl daemon-reload
+
+echoYellow "Should receiver be autostarted on boot (y/n)? "
+read enable_logger
+if [ "$enable_logger" = "y" ]; then
+    systemctl enable parosReceiver
+else
+    systemctl disable parosReceiver
+fi
