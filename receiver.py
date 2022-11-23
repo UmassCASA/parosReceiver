@@ -1,6 +1,7 @@
 import pika
 import json
-import time
+import os
+from datetime import datetime
 from pathlib import Path
 
 def main():
@@ -11,7 +12,7 @@ def main():
     channel.queue_declare(queue='parosLogger')
 
     def callback(ch, method, properties, body):
-        output_filename = time.strftime("%Y-%m-%d-%H") + ".csv"
+        output_filename = datetime.utcnow().strftime("%Y-%m-%d-%H") + ".csv"
 
         cur_line = body.decode("utf-8")
         # remove unicode characters
@@ -20,16 +21,18 @@ def main():
 
         json_data = json.loads(cur_line)
 
-        cur_day = time.strftime("%Y-%m-%d")
+        cur_day = datetime.utcnow().strftime("%Y-%m-%d")
         data_folder = "recorded_data"
 
+        module_folder = os.path.join(data_folder, json_data["module_id"])
+
         if json_data["sensor_id"] == "anemometer":
-            output_folder = data_folder + "/anemometer/" + cur_day
-            output_file = output_folder + "/wind_" + output_filename
+            output_folder = os.path.join(module_folder, "anemometer", cur_day)
+            output_file = os.path.join(output_folder, "wind_" + output_filename)
             field_list = ["module_id", "sensor_id", "timestamp", "raw_adc", "voltage", "value"]
         else:
-            output_folder = data_folder + "/baro/" + cur_day
-            output_file = output_folder + "/baro_" + output_filename
+            output_folder = os.path.join(module_folder, "baro", cur_day)
+            output_file = os.path.join(output_folder, "baro_" + output_filename)
             field_list = ["module_id", "sensor_id", "timestamp", "dev_timestamp", "value"]
 
         # create folder if it doesn't exist
