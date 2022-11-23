@@ -1,4 +1,0 @@
-#!/bin/bash
-
-rabbitmq_user="paros"
-rabbitmq_pass=""

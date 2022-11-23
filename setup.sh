@@ -52,9 +52,9 @@ rabbitmqctl add_user $rmq_user $rmq_pass
 rabbitmqctl set_user_tags $rmq_user administrator
 rabbitmqctl set_permissions -p / $rmq_user "." "." "."
 
-echoGreen "Creating system files...\n"
+echoGreen "Creating systemd files...\n"
 
-cp $git_location/parosReceiver.service /etc/systemd/system/parosReceiver
+cp $git_location/parosReceiver.service /etc/systemd/system/
 systemctl daemon-reload
 
 echoYellow "Should receiver be autostarted on boot (y/n)? "
